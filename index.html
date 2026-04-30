@@ -306,12 +306,15 @@
 <section class="section schedule-section" id="schedule">
   <div class="section-label">프로그램 일정</div>
   <h2 class="section-title">3일간의 <span>여정</span></h2>
+  
   <div class="schedule-tabs">
     <button class="tab active" onclick="showDay(0)">1일차 (6/6)</button>
     <button class="tab" onclick="showDay(1)">2일차 (6/7)</button>
     <button class="tab" onclick="showDay(2)">3일차 (6/8)</button>
   </div>
+
   <div class="schedule-list">
+    <!-- 1일차 (day0) -->
     <div class="schedule-day active" id="day0">
       <div class="schedule-item">
         <div class="s-time">10:00 - 11:00</div>
@@ -333,10 +336,9 @@
         <div class="s-time">13:30 - 15:30</div>
         <div><div class="s-title">세미나 <span class="s-badge badge-worship">예배</span></div><div class="s-desc">첫번째 세미나!</div></div>
       </div>
-            <div class="schedule-item">
+      <div class="schedule-item">
         <div class="s-time">15:30 - 16:30</div>
         <div><div class="s-title">조모임 <span class="s-badge badge-team">팀활동</span></div><div class="s-desc">같은 조원끼리 오붓하게 시간보내기!</div></div>
-      </div>
       </div>
       <div class="schedule-item">
         <div class="s-time">16:30 - 17:30</div>
@@ -354,14 +356,15 @@
         <div class="s-time">19:00 - 21:00</div>
         <div><div class="s-title">저녁 예배1. 침묵에서 피는 소망 <span class="s-badge badge-worship">예배</span></div><div class="s-desc">첫 저녁 예배!</div></div>
       </div>
-        <div class="schedule-item">
+      <div class="schedule-item">
         <div class="s-time">21:00 - 21:30</div>
         <div><div class="s-title">조모임 <span class="s-badge badge-team">팀활동</span></div><div class="s-desc">같은 조원끼리 오붓하게 시간보내기!</div></div>
-      </div>  
-   
+      </div>
     </div>
+
+    <!-- 2일차 (day1) -->
     <div class="schedule-day" id="day1">
-     <div class="schedule-item">
+      <div class="schedule-item">
         <div class="s-time">08:00 - 09:00</div>
         <div><div class="s-title">아침식사<span class="s-badge badge-meal">식사</span></div><div class="s-desc">아침이다!!!</div></div>
       </div>
@@ -378,17 +381,16 @@
         <div><div class="s-title">달려라 임브레이스 <span class="s-badge badge-team">팀활동</span></div><div class="s-desc">관절 조심하세요!</div></div>
       </div>
       <div class="schedule-item">
-        <div class="s-time">12:30 - 12:30</div>
+        <div class="s-time">12:00 - 12:30</div> <!-- 12:30-12:30에서 수정 -->
         <div><div class="s-title">휴식 <span class="s-badge badge-team">휴식</span></div><div class="s-desc">뛰었음 쉬어야지 음음!</div></div>
       </div>
-     <div class="schedule-item">
+      <div class="schedule-item">
         <div class="s-time">12:30 - 13:30</div>
         <div><div class="s-title">점심 식사 <span class="s-badge badge-meal">식사</span></div><div class="s-desc">밥!</div></div>
       </div>
-            <div class="schedule-item">
+      <div class="schedule-item">
         <div class="s-time">13:30 - 14:30</div>
         <div><div class="s-title"> 주일예배 - 소망의 이유 <span class="s-badge badge-worship">예배</span></div><div class="s-desc">주일예배 참을 수 없지!</div></div>
-      </div>
       </div>
       <div class="schedule-item">
         <div class="s-time">14:30 - 15:30</div>
@@ -406,11 +408,13 @@
         <div class="s-time">19:00 - 21:00</div>
         <div><div class="s-title">저녁 예배2. 소망을 꿈꾸는 재활 <span class="s-badge badge-worship">예배</span></div><div class="s-desc">두번째 저녁 예배!</div></div>
       </div>
-        <div class="schedule-item">
+      <div class="schedule-item">
         <div class="s-time">21:00 - 21:30</div>
         <div><div class="s-title">조모임 <span class="s-badge badge-team">팀활동</span></div><div class="s-desc">같은 조원끼리 오붓하게 시간보내기!</div></div>
-      </div>  
+      </div>
     </div>
+
+    <!-- 3일차 (day2) -->
     <div class="schedule-day" id="day2">
       <div class="schedule-item">
         <div class="s-time">08:00 - 09:00</div>
@@ -432,13 +436,13 @@
         <div class="s-time">11:00 - 12:30</div>
         <div><div class="s-title">미션 임파서블 <span class="s-badge badge-game">게임</span></div><div class="s-desc">하지만 임브레이스에 불가능은 없지</div></div>
       </div>
-     <div class="schedule-item">
+      <div class="schedule-item">
         <div class="s-time">12:30 - 13:30</div>
         <div><div class="s-title">점심 식사 <span class="s-badge badge-meal">식사</span></div><div class="s-desc">밥!</div></div>
       </div>
-     <div class="schedule-item">
-        <div class="s-time"> 13:30</div>
-        <div><div class="s-title"> 집 <span class="s-badge badge-game">집</span></div><div class="s-desc">집!</div></div>
+      <div class="schedule-item">
+        <div class="s-time">13:30 - 14:00</div> <!-- 종료 시간 추가 -->
+        <div><div class="s-title"> 집 <span class="s-badge badge-game">귀가</span></div><div class="s-desc">집!</div></div>
       </div>
     </div>
   </div>
