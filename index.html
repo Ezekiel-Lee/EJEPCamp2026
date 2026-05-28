@@ -701,7 +701,7 @@
     </div>
     <div class="reg-note">참가비: 1인 $298.00 (식사·숙박 포함) · 6월 6일 캠프 도착!</div>
     <script>
-    fetch('/api/stats').then(r=>r.json()).then(d=>{
+    fetch('https://ejepcamp2026-production.up.railway.app/api/stats').then(r=>r.json()).then(d=>{
       document.getElementById('idx-total').textContent = d.total;
       document.getElementById('idx-attended').textContent = d.attended;
       document.getElementById('idx-absent').textContent = d.absent;
