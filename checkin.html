@@ -224,14 +224,15 @@ body::before {
 
 <!-- 체크인 폼 -->
 <div class="card" id="form-card">
-  <div class="card-title">체크인</div>
+  <div class="card-title">Check-in</div>
   <div class="card-sub">이름과 전화번호 끝 3자리를 입력해주세요</div>
+  <div class="card-sub">Please enter your name and the last 3 digits of your phone number</div>
   <div class="field">
-    <label for="inp-name">이름</label>
-    <input type="text" id="inp-name" placeholder="홍길동" autocomplete="off" inputmode="text">
+    <label for="inp-name"> 이름 / Name</label>
+    <input type="text" id="inp-name" placeholder="Ezekiel Lee" autocomplete="off" inputmode="text">
   </div>
   <div class="field">
-    <label for="inp-phone">전화번호 끝 3자리</label>
+    <label for="inp-phone">전화번호 끝 3자리 / the last 3 digits of your phone number</label>
     <input type="number" id="inp-phone" placeholder="678" maxlength="3" inputmode="numeric">
   </div>
   <button class="btn" id="btn-checkin" onclick="doCheckin()">체크인하기</button>
@@ -242,16 +243,16 @@ body::before {
 <div class="result-card" id="result-card">
   <div class="result-header">
     <div class="check-icon">✓</div>
-    <h2 id="res-name">환영합니다!</h2>
+    <h2 id="res-name">Welcome!</h2>
     <p id="res-time"></p>
   </div>
   <div class="result-body">
     <div class="info-row">
-      <span class="info-key">팀 배정</span>
+      <span class="info-key">팀 배정 / Team </span>
       <span class="badge" id="res-team">—</span>
     </div>
     <div class="info-row">
-      <span class="info-key">방 배정</span>
+      <span class="info-key">방 배정 / Room </span>
       <span class="info-val" id="res-room">—</span>
     </div>
     <div class="info-row">
@@ -281,7 +282,7 @@ body::before {
 <!-- 이미 체크인 -->
 <div class="already-card" id="already-card">
   <div class="icon">✓</div>
-  <h3 id="already-name">이미 체크인하셨습니다</h3>
+  <h3 id="already-name">이미 체크인하셨습니다 / You have already checked-in</h3>
   <p id="already-time"></p>
   <button class="btn-retry" style="margin-top:1rem" onclick="resetForm()">← 돌아가기</button>
 </div>
