@@ -1,4 +1,4 @@
 // ============================================================
 // ★ NAS 도메인 받으면 이 파일의 API_URL 한 줄만 수정하세요!
 // ============================================================
-const API_URL = 'ejepcamp2026-production.up.railway.app'; // 예: 'https://your-nas-domain.com:3000'
+const API_URL = 'https://ejepcamp2026-production.up.railway.app'; // 예: 'https://your-nas-domain.com:3000'
