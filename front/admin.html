@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 — EJEP Camp 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --primary: #3B5FA0;
+  --primary-dark: #2A4580;
+  --primary-deeper: #1E3366;
+  --accent: #F5C842;
+  --accent-dark: #D4A820;
+  --white: #FAFAF5;
+  --white-dim: rgba(250,250,245,0.65);
+  --white-faint: rgba(250,250,245,0.1);
+  --success: #4CAF82;
+  --error: #E85D4A;
+  --surface: rgba(255,255,255,0.06);
+  --border: rgba(250,250,245,0.12);
+}
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--primary-deeper);
+  color: var(--white);
+  min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ── 로그인 ── */
+#login-screen {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+.login-box {
+  background: var(--surface);
+  border: 1px solid rgba(245,200,66,0.25);
+  border-radius: 20px; padding: 2.5rem 2rem;
+  width: 100%; max-width: 360px;
+  text-align: center;
+}
+.login-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 3px; color: var(--accent); }
+.login-sub { font-size: 0.8rem; color: var(--white-dim); margin: 0.3rem 0 1.8rem; }
+.login-box input {
+  width: 100%; background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(250,250,245,0.2); border-radius: 10px;
+  color: var(--white); font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1rem; padding: 0.85rem 1rem; outline: none; text-align: center;
+  letter-spacing: 3px; margin-bottom: 1rem;
+  transition: border-color 0.2s;
+}
+.login-box input:focus { border-color: var(--accent); }
+.login-box input::placeholder { letter-spacing: 1px; }
+.btn-primary {
+  width: 100%; padding: 0.85rem;
+  background: var(--accent); color: #1E3366;
+  border: none; border-radius: 10px;
+  font-family: 'Noto Sans KR', sans-serif; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s, transform 0.1s;
+}
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-primary:active { transform: scale(0.98); }
+.login-err { font-size: 0.82rem; color: #FFB3A7; margin-top: 0.75rem; display: none; }
+
+/* ── 메인 레이아웃 ── */
+#admin-screen { display: none; position: relative; z-index: 1; }
+
+.top-nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2rem;
+  background: rgba(20,38,85,0.7); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(245,200,66,0.2);
+}
+.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 3px; color: var(--accent); }
+.nav-right { display: flex; gap: 0.75rem; align-items: center; }
+.btn-sm {
+  padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; border: 1px solid; transition: all 0.2s; font-family: 'Noto Sans KR', sans-serif;
+}
+.btn-export { background: transparent; border-color: rgba(245,200,66,0.4); color: var(--accent); }
+.btn-export:hover { background: rgba(245,200,66,0.1); }
+.btn-upload { background: var(--accent); border-color: var(--accent); color: #1E3366; }
+.btn-upload:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.btn-logout { background: transparent; border-color: rgba(250,250,245,0.2); color: var(--white-dim); }
+.btn-logout:hover { border-color: rgba(250,250,245,0.4); color: var(--white); }
+
+.main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+
+/* ── 통계 카드 ── */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.25rem 1.5rem;
+}
+.stat-card-num { font-size: 2.2rem; font-weight: 900; line-height: 1; }
+.stat-card-label { font-size: 0.75rem; color: var(--white-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 0.3rem; }
+.stat-card.total .stat-card-num { color: var(--accent); }
+.stat-card.attended .stat-card-num { color: #7DE8B4; }
+.stat-card.absent .stat-card-num { color: #FFB3A7; }
+
+.progress-bar-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 2rem;
+}
+.progress-label { display: flex; justify-content: space-between; margin-bottom: 0.6rem; }
+.progress-label span { font-size: 0.8rem; color: var(--white-dim); }
+.progress-label strong { font-size: 0.8rem; color: var(--accent); }
+.progress-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF82, #7DE8B4); border-radius: 4px; transition: width 0.6s ease; }
+
+/* ── 필터 / 검색 ── */
+.toolbar {
+  display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;
+}
+.search-input {
+  flex: 1; min-width: 200px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--white);
+  font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem;
+  padding: 0.55rem 1rem; outline: none; transition: border-color 0.2s;
+}
+.search-input:focus { border-color: rgba(245,200,66,0.5); }
+.search-input::placeholder { color: rgba(250,250,245,0.3); }
+.filter-btn {
+  padding: 0.55rem 1rem; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--white-dim); font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.82rem; cursor: pointer; transition: all 0.2s;
+}
+.filter-btn.active { background: rgba(245,200,66,0.15); border-color: rgba(245,200,66,0.4); color: var(--accent); }
+
+/* ── 테이블 ── */
+.table-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 0.75rem 1rem; text-align: left;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--white-dim); border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.15);
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid rgba(250,250,245,0.05); transition: background 0.15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.04); }
+tbody tr.family-group { background: rgba(245,200,66,0.03); }
+tbody td { padding: 0.7rem 1rem; font-size: 0.88rem; vertical-align: middle; }
+
+.tag-family {
+  display: inline-block; background: rgba(245,200,66,0.1);
+  border: 1px solid rgba(245,200,66,0.25); border-radius: 4px;
+  padding: 0.1rem 0.4rem; font-size: 0.7rem; color: var(--accent);
+  margin-left: 0.3rem; vertical-align: middle;
+}
+.status-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.78rem; font-weight: 700;
+}
+.status-badge.done { background: rgba(76,175,130,0.15); color: #7DE8B4; }
+.status-badge.pending { background: rgba(250,250,245,0.08); color: var(--white-dim); }
+
+.btn-toggle {
+  padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; border: 1px solid; font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.2s; white-space: nowrap;
+}
+.btn-toggle.check-in { background: rgba(76,175,130,0.1); border-color: rgba(76,175,130,0.3); color: #7DE8B4; }
+.btn-toggle.check-in:hover { background: rgba(76,175,130,0.25); }
+.btn-toggle.check-out { background: rgba(232,93,74,0.1); border-color: rgba(232,93,74,0.3); color: #FFB3A7; }
+.btn-toggle.check-out:hover { background: rgba(232,93,74,0.25); }
+
+.note-tag { font-size: 0.75rem; color: #FFB3A7; }
+.empty-msg { text-align: center; padding: 3rem; color: var(--white-dim); font-size: 0.9rem; }
+
+/* ── 업로드 모달 ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(10,20,50,0.7); backdrop-filter: blur(6px);
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: #1E3366; border: 1px solid rgba(245,200,66,0.3);
+  border-radius: 16px; padding: 2rem; width: 100%; max-width: 420px;
+}
+.modal h3 { font-size: 1.1rem; color: var(--accent); margin-bottom: 0.5rem; }
+.modal p { font-size: 0.83rem; color: var(--white-dim); margin-bottom: 1.5rem; line-height: 1.7; }
+.upload-zone {
+  border: 2px dashed rgba(245,200,66,0.3); border-radius: 12px;
+  padding: 2rem; text-align: center; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 1rem;
+}
+.upload-zone:hover { border-color: var(--accent); background: rgba(245,200,66,0.05); }
+.upload-zone input { display: none; }
+.upload-zone-text { font-size: 0.9rem; color: var(--white-dim); }
+.upload-zone-text strong { color: var(--accent); display: block; font-size: 1rem; margin-bottom: 0.3rem; }
+.modal-btns { display: flex; gap: 0.75rem; }
+.btn-cancel { flex: 1; padding: 0.75rem; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--white-dim); font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem; cursor: pointer; }
+.btn-cancel:hover { border-color: rgba(250,250,245,0.3); color: var(--white); }
+.btn-confirm { flex: 1; padding: 0.75rem; background: var(--accent); border: none; border-radius: 8px; color: #1E3366; font-family: 'Noto Sans KR', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+.btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+.upload-result { margin-top: 0.75rem; font-size: 0.83rem; padding: 0.65rem 0.9rem; border-radius: 8px; display: none; }
+.upload-result.success { background: rgba(76,175,130,0.15); color: #7DE8B4; border: 1px solid rgba(76,175,130,0.3); }
+.upload-result.error { background: rgba(232,93,74,0.15); color: #FFB3A7; border: 1px solid rgba(232,93,74,0.3); }
+
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+  .main { padding: 1rem; }
+  .top-nav { padding: 0.75rem 1rem; }
+  thead th:nth-child(4), thead th:nth-child(5), thead th:nth-child(7) { display: none; }
+  tbody td:nth-child(4), tbody td:nth-child(5), tbody td:nth-child(7) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- 로그인 -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">EJEP 2026</div>
+    <div class="login-sub">관리자 페이지</div>
+    <input type="password" id="pw-input" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn-primary" onclick="login()">로그인</button>
+    <div class="login-err" id="login-err">비밀번호가 올바르지 않습니다.</div>
+  </div>
+</div>
+
+<!-- 관리자 화면 -->
+<div id="admin-screen">
+  <nav class="top-nav">
+    <div class="nav-logo">EJEP 2026 · 관리자</div>
+    <div class="nav-right">
+      <button class="btn-sm btn-export" onclick="exportCSV()">CSV 내보내기</button>
+      <button class="btn-sm btn-upload" onclick="document.getElementById('upload-modal').classList.add('open')">엑셀 업로드</button>
+      <button class="btn-sm btn-logout" onclick="logout()">로그아웃</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <!-- 통계 -->
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-card-num" id="a-total">—</div>
+        <div class="stat-card-label">총원</div>
+      </div>
+      <div class="stat-card attended">
+        <div class="stat-card-num" id="a-attended">—</div>
+        <div class="stat-card-label">참석</div>
+      </div>
+      <div class="stat-card absent">
+        <div class="stat-card-num" id="a-absent">—</div>
+        <div class="stat-card-label">결원</div>
+      </div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span>참석률</span>
+        <strong id="a-pct">0%</strong>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- 필터 + 검색 -->
+    <div class="toolbar">
+      <input type="text" class="search-input" id="search-input" placeholder="이름 / 방 / 팀 검색..." oninput="renderTable()">
+      <button class="filter-btn active" id="f-all" onclick="setFilter('all')">전체</button>
+      <button class="filter-btn" id="f-attended" onclick="setFilter('attended')">참석</button>
+      <button class="filter-btn" id="f-absent" onclick="setFilter('absent')">미참석</button>
+    </div>
+
+    <!-- 명단 테이블 -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>이름</th>
+            <th>팀</th>
+            <th>방</th>
+            <th>성별</th>
+            <th>나이</th>
+            <th>상태</th>
+            <th>체크인 시각</th>
+            <th>조정</th>
+          </tr>
+        </thead>
+        <tbody id="member-table"></tbody>
+      </table>
+      <div class="empty-msg" id="empty-msg" style="display:none">검색 결과가 없습니다.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 업로드 모달 -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal">
+    <h3>엑셀 명단 업로드</h3>
+    <p>컬럼: <strong>이름 / 전화번호 / 성별 / 나이 / 가족그룹ID / 방배정 / 팀배정 / 비고</strong><br>기존 체크인 기록은 유지됩니다.</p>
+    <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept=".xlsx,.xls" onchange="handleFileSelect(this)">
+      <div class="upload-zone-text">
+        <strong id="file-name">📂 파일 선택</strong>
+        <span>.xlsx / .xls 파일을 선택해주세요</span>
+      </div>
+    </div>
+    <div class="upload-result" id="upload-result"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeUploadModal()">취소</button>
+      <button class="btn-confirm" id="btn-confirm-upload" onclick="uploadFile()" disabled>업로드</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let adminPw = '';
+let allMembers = [];
+let currentFilter = 'all';
+let selectedFile = null;
+
+// ── 로그인 ──────────────────────────────────────────
+async function login() {
+  const pw = document.getElementById('pw-input').value;
+  try {
+    const r = await fetch(API + '/api/admin/members', { headers: { 'x-admin-password': pw } });
+    if (r.status === 401) { document.getElementById('login-err').style.display = 'block'; return; }
+    adminPw = pw;
+    const data = await r.json();
+    allMembers = data.members;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+    renderAll();
+    setInterval(loadMembers, 20000);
+  } catch(e) {
+    document.getElementById('login-err').textContent = '서버 연결 실패';
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+function logout() {
+  adminPw = '';
+  allMembers = [];
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('login-err').style.display = 'none';
+}
+
+// ── 데이터 로드 ──────────────────────────────────────
+async function loadMembers() {
+  try {
+    const r = await fetch(API + '/api/admin/members', { headers: { 'x-admin-password': adminPw } });
+    const data = await r.json();
+    allMembers = data.members;
+    renderAll();
+  } catch(e) {}
+}
+
+function renderAll() {
+  renderStats();
+  renderTable();
+}
+
+function renderStats() {
+  const total = allMembers.length;
+  const attended = allMembers.filter(m => m.checkedIn).length;
+  const absent = total - attended;
+  const pct = total ? Math.round(attended / total * 100) : 0;
+  document.getElementById('a-total').textContent = total;
+  document.getElementById('a-attended').textContent = attended;
+  document.getElementById('a-absent').textContent = absent;
+  document.getElementById('a-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ── 테이블 렌더 ──────────────────────────────────────
+function setFilter(f) {
+  currentFilter = f;
+  ['all','attended','absent'].forEach(id => {
+    document.getElementById('f-' + id).classList.toggle('active', id === f);
+  });
+  renderTable();
+}
+
+function renderTable() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  let members = [...allMembers];
+
+  if (currentFilter === 'attended') members = members.filter(m => m.checkedIn);
+  if (currentFilter === 'absent') members = members.filter(m => !m.checkedIn);
+  if (q) members = members.filter(m =>
+    m.name.includes(q) || (m.room || '').toLowerCase().includes(q) || (m.team || '').toLowerCase().includes(q)
+  );
+
+  // 가족 그룹 단위 정렬: 그룹 있는 것 먼저, 같은 그룹끼리 묶기
+  members.sort((a, b) => {
+    const ga = a.familyGroup || 'ZZZ_' + a.name;
+    const gb = b.familyGroup || 'ZZZ_' + b.name;
+    return ga.localeCompare(gb);
+  });
+
+  const tbody = document.getElementById('member-table');
+  const empty = document.getElementById('empty-msg');
+
+  if (members.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  let lastGroup = null;
+  tbody.innerHTML = members.map(m => {
+    const isNewGroup = m.familyGroup && m.familyGroup !== lastGroup;
+    if (m.familyGroup) lastGroup = m.familyGroup;
+
+    const checkinTime = m.checkedInAt
+      ? new Date(m.checkedInAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      : '—';
+
+    return `<tr class="${isNewGroup ? 'family-group' : ''}">
+      <td>
+        ${m.name}
+        ${m.familyGroup ? `<span class="tag-family">${m.familyGroup}</span>` : ''}
+        ${m.note ? `<div class="note-tag">⚠ ${m.note}</div>` : ''}
+      </td>
+      <td>${m.team || '—'}</td>
+      <td>${m.room || '—'}</td>
+      <td>${m.gender || '—'}</td>
+      <td>${m.age ? m.age + '세' : '—'}</td>
+      <td>
+        <span class="status-badge ${m.checkedIn ? 'done' : 'pending'}">
+          ${m.checkedIn ? '✓ 참석' : '미도착'}
+        </span>
+      </td>
+      <td style="font-size:0.8rem;color:var(--white-dim)">${checkinTime}</td>
+      <td>
+        <button class="btn-toggle ${m.checkedIn ? 'check-out' : 'check-in'}"
+          onclick="toggleCheckin(${m.id}, ${!m.checkedIn})">
+          ${m.checkedIn ? '취소' : '체크인'}
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── 수동 체크인 토글 ─────────────────────────────────
+async function toggleCheckin(id, checkedIn) {
+  try {
+    const r = await fetch(API + '/api/admin/members/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPw },
+      body: JSON.stringify({ checkedIn })
+    });
+    if (r.ok) {
+      const d = await r.json();
+      const idx = allMembers.findIndex(m => m.id === id);
+      if (idx !== -1) allMembers[idx] = d.member;
+      renderAll();
+    }
+  } catch(e) { alert('오류가 발생했습니다.'); }
+}
+
+// ── CSV 내보내기 ─────────────────────────────────────
+async function exportCSV() {
+  const url = API + '/api/admin/export';
+  const a = document.createElement('a');
+  a.href = url;
+  a.setAttribute('download', '');
+  // 헤더 필요 — fetch로 다운로드
+  try {
+    const r = await fetch(url, { headers: { 'x-admin-password': adminPw } });
+    const blob = await r.blob();
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'checkin_' + Date.now() + '.csv';
+    link.click();
+  } catch(e) { alert('내보내기 실패'); }
+}
+
+// ── 엑셀 업로드 ──────────────────────────────────────
+function handleFileSelect(input) {
+  selectedFile = input.files[0];
+  if (selectedFile) {
+    document.getElementById('file-name').textContent = '📄 ' + selectedFile.name;
+    document.getElementById('btn-confirm-upload').disabled = false;
+    document.getElementById('upload-result').style.display = 'none';
+  }
+}
+
+async function uploadFile() {
+  if (!selectedFile) return;
+  const btn = document.getElementById('btn-confirm-upload');
+  btn.disabled = true; btn.textContent = '업로드 중...';
+
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+
+  try {
+    const r = await fetch(API + '/api/admin/upload', {
+      method: 'POST',
+      headers: { 'x-admin-password': adminPw },
+      body: formData
+    });
+    const d = await r.json();
+    const resEl = document.getElementById('upload-result');
+    if (r.ok) {
+      resEl.className = 'upload-result success';
+      resEl.textContent = `완료! 총 ${d.total}명 (신규 ${d.added}명 / 업데이트 ${d.updated}명)`;
+      resEl.style.display = 'block';
+      await loadMembers();
+      setTimeout(closeUploadModal, 2000);
+    } else {
+      resEl.className = 'upload-result error';
+      resEl.textContent = d.error || '업로드 실패';
+      resEl.style.display = 'block';
+    }
+  } catch(e) {
+    const resEl = document.getElementById('upload-result');
+    resEl.className = 'upload-result error';
+    resEl.textContent = '서버 연결 실패';
+    resEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = '업로드';
+  }
+}
+
+function closeUploadModal() {
+  document.getElementById('upload-modal').classList.remove('open');
+  document.getElementById('file-name').textContent = '📂 파일 선택';
+  document.getElementById('btn-confirm-upload').disabled = true;
+  document.getElementById('upload-result').style.display = 'none';
+  selectedFile = null;
+  document.getElementById('file-input').value = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeUploadModal();
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') login();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "campName": "EJEP Camp 2026",
+  "campDate": "2026-06-06",
+  "members": [
+    { "id": 1, "name": "김민준", "phone": "0412345678", "gender": "남", "age": 42, "familyGroup": "FAM-001", "room": "A101", "team": "믿음팀", "note": "", "checkedIn": false, "checkedInAt": null },
+    { "id": 2, "name": "김지연", "phone": "0412345679", "gender": "여", "age": 39, "familyGroup": "FAM-001", "room": "B201", "team": "믿음팀", "note": "채식", "checkedIn": false, "checkedInAt": null },
+    { "id": 3, "name": "김서아", "phone": "0498111222", "gender": "여", "age": 14, "familyGroup": "FAM-001", "room": "B201", "team": "소망팀", "note": "", "checkedIn": false, "checkedInAt": null },
+    { "id": 4, "name": "박성현", "phone": "0423456789", "gender": "남", "age": 35, "familyGroup": "FAM-002", "room": "A102", "team": "소망팀", "note": "", "checkedIn": false, "checkedInAt": null },
+    { "id": 5, "name": "박혜진", "phone": "0423456780", "gender": "여", "age": 33, "familyGroup": "FAM-002", "room": "B202", "team": "소망팀", "note": "견과류 알레르기", "checkedIn": false, "checkedInAt": null },
+    { "id": 6, "name": "이준호", "phone": "0434567890", "gender": "남", "age": 28, "familyGroup": "", "room": "A103", "team": "사랑팀", "note": "", "checkedIn": false, "checkedInAt": null },
+    { "id": 7, "name": "최수빈", "phone": "0445678901", "gender": "여", "age": 26, "familyGroup": "", "room": "B203", "team": "사랑팀", "note": "", "checkedIn": false, "checkedInAt": null },
+    { "id": 8, "name": "정재원", "phone": "0456789012", "gender": "남", "age": 45, "familyGroup": "FAM-003", "room": "A104", "team": "믿음팀", "note": "당뇨", "checkedIn": false, "checkedInAt": null },
+    { "id": 9, "name": "정미영", "phone": "0456789013", "gender": "여", "age": 43, "familyGroup": "FAM-003", "room": "B204", "team": "소망팀", "note": "", "checkedIn": false, "checkedInAt": null },
+    { "id": 10, "name": "한동욱", "phone": "0467890123", "gender": "남", "age": 31, "familyGroup": "", "room": "A105", "team": "사랑팀", "note": "", "checkedIn": false, "checkedInAt": null }
+  ]
+}

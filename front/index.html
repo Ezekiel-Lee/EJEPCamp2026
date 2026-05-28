@@ -680,10 +680,33 @@
       <div class="count-box"><div class="count-num" id="cd-secs">00</div><div class="count-label">초</div></div>
     </div>
     
-    <div style="margin-top:1rem;">
-      <button class="btn-primary" style="width:100%; padding:1rem; font-size:1rem;" onclick="window.open('https://forms.gle/m3ytAgpzDttpDSBp7', '_blank')">체크인</button>
+    <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.75rem;">
+      <button class="btn-primary" style="width:100%; padding:1rem; font-size:1rem;" onclick="window.location.href='checkin.html'">🏕️ 현장 체크인</button>
+      <div id="stats-preview" style="display:flex; justify-content:center; gap:2rem; padding:0.75rem; background:rgba(255,255,255,0.05); border-radius:10px; border:1px solid rgba(245,200,66,0.15);">
+        <div style="text-align:center">
+          <div style="font-size:1.3rem;font-weight:900;color:var(--accent)" id="idx-total">—</div>
+          <div style="font-size:0.65rem;color:rgba(250,250,245,0.5);letter-spacing:1px;text-transform:uppercase">총원</div>
+        </div>
+        <div style="width:1px;background:rgba(250,250,245,0.1)"></div>
+        <div style="text-align:center">
+          <div style="font-size:1.3rem;font-weight:900;color:#7DE8B4" id="idx-attended">—</div>
+          <div style="font-size:0.65rem;color:rgba(250,250,245,0.5);letter-spacing:1px;text-transform:uppercase">참석</div>
+        </div>
+        <div style="width:1px;background:rgba(250,250,245,0.1)"></div>
+        <div style="text-align:center">
+          <div style="font-size:1.3rem;font-weight:900;color:#FFB3A7" id="idx-absent">—</div>
+          <div style="font-size:0.65rem;color:rgba(250,250,245,0.5);letter-spacing:1px;text-transform:uppercase">결원</div>
+        </div>
+      </div>
     </div>
     <div class="reg-note">참가비: 1인 $298.00 (식사·숙박 포함) · 6월 6일 캠프 도착!</div>
+    <script>
+    fetch('/api/stats').then(r=>r.json()).then(d=>{
+      document.getElementById('idx-total').textContent = d.total;
+      document.getElementById('idx-attended').textContent = d.attended;
+      document.getElementById('idx-absent').textContent = d.absent;
+    }).catch(()=>{});
+    </script>
   </div>
 </section>
 

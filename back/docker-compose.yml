@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  checkin:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PORT=3000
+      - ADMIN_PASSWORD=ejep2026
+    restart: unless-stopped

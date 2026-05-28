@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>체크인 — EJEP Camp 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --primary: #3B5FA0;
+  --primary-dark: #2A4580;
+  --primary-deeper: #1E3366;
+  --accent: #F5C842;
+  --accent-dark: #D4A820;
+  --white: #FAFAF5;
+  --white-dim: rgba(250,250,245,0.7);
+  --white-faint: rgba(250,250,245,0.15);
+  --success: #4CAF82;
+  --error: #E85D4A;
+  --API: 'http://localhost:3000';
+}
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--primary);
+  color: var(--white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem; letter-spacing: 3px;
+  color: var(--accent);
+  position: fixed; top: 1.5rem; left: 2rem;
+  z-index: 10;
+  text-decoration: none;
+}
+.logo:hover { opacity: 0.8; }
+
+/* ── 통계 바 ── */
+.stats-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: flex-end; align-items: center;
+  gap: 1.5rem; padding: 1.1rem 2rem;
+  background: rgba(20,38,85,0.6);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(245,200,66,0.2);
+  z-index: 10;
+}
+.stat { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; }
+.stat-num { font-size: 1.1rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.stat-label { font-size: 0.65rem; color: var(--white-dim); letter-spacing: 1px; text-transform: uppercase; }
+.stat-divider { width: 1px; height: 28px; background: rgba(250,250,245,0.15); }
+
+/* ── 메인 카드 ── */
+.card {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 420px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(245,200,66,0.25);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  backdrop-filter: blur(10px);
+  margin-top: 4rem;
+  animation: fadeUp 0.6s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; letter-spacing: 3px;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+.card-sub { font-size: 0.85rem; color: var(--white-dim); margin-bottom: 2rem; line-height: 1.6; }
+
+/* ── 폼 ── */
+.field { margin-bottom: 1.2rem; }
+.field label {
+  display: block;
+  font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 0.5rem;
+}
+.field input {
+  width: 100%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(250,250,245,0.2);
+  border-radius: 10px;
+  color: var(--white);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1.1rem;
+  padding: 0.85rem 1rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.field input::placeholder { color: rgba(250,250,245,0.3); }
+.field input:focus {
+  border-color: var(--accent);
+  background: rgba(255,255,255,0.12);
+}
+.field input[type="number"]::-webkit-inner-spin-button,
+.field input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.btn {
+  width: 100%; padding: 1rem;
+  background: var(--accent);
+  color: #1E3366;
+  border: none; border-radius: 10px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 0.5rem;
+}
+.btn:hover { background: var(--accent-dark); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.error-msg {
+  background: rgba(232,93,74,0.15);
+  border: 1px solid rgba(232,93,74,0.4);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: #FFB3A7;
+  margin-top: 1rem;
+  display: none;
+}
+
+/* ── 결과 카드 ── */
+.result-card {
+  display: none;
+  width: 100%; max-width: 480px;
+  position: relative; z-index: 1;
+  margin-top: 4rem;
+  animation: fadeUp 0.5s ease both;
+}
+
+.result-header {
+  background: var(--success);
+  border-radius: 16px 16px 0 0;
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+.result-header .check-icon {
+  font-size: 2.5rem; margin-bottom: 0.4rem;
+}
+.result-header h2 {
+  font-size: 1.4rem; font-weight: 700;
+  color: #fff;
+}
+.result-header p {
+  font-size: 0.85rem; color: rgba(255,255,255,0.8);
+  margin-top: 0.2rem;
+}
+
+.result-body {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(245,200,66,0.2);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: 1.5rem 2rem;
+}
+
+.info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(250,250,245,0.08);
+}
+.info-row:last-child { border-bottom: none; }
+.info-key { font-size: 0.78rem; color: var(--white-dim); letter-spacing: 1px; text-transform: uppercase; }
+.info-val { font-size: 1rem; font-weight: 700; color: var(--white); }
+.badge {
+  display: inline-block;
+  background: rgba(245,200,66,0.2);
+  border: 1px solid rgba(245,200,66,0.4);
+  color: var(--accent);
+  border-radius: 6px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.85rem; font-weight: 700;
+}
+
+.note-box {
+  background: rgba(232,93,74,0.12);
+  border: 1px solid rgba(232,93,74,0.3);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.83rem; color: #FFB3A7;
+  margin-top: 0.75rem;
+}
+
+/* ── 가족 섹션 ── */
+.family-section {
+  margin-top: 1rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(250,250,245,0.1);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+}
+.family-title {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+.family-member {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(250,250,245,0.06);
+  font-size: 0.9rem;
+}
+.family-member:last-child { border-bottom: none; }
+.fm-name { color: var(--white); }
+.fm-status {
+  font-size: 0.75rem; font-weight: 700;
+  padding: 0.15rem 0.5rem; border-radius: 4px;
+}
+.fm-status.done { background: rgba(76,175,130,0.2); color: #7DE8B4; }
+.fm-status.pending { background: rgba(250,250,245,0.1); color: var(--white-dim); }
+
+.btn-retry {
+  width: 100%; margin-top: 1rem; padding: 0.8rem;
+  background: transparent;
+  border: 1px solid rgba(250,250,245,0.3);
+  border-radius: 10px;
+  color: var(--white-dim);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.9rem; cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-retry:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── 이미 체크인 상태 ── */
+.already-card {
+  background: rgba(245,200,66,0.1);
+  border: 1px solid rgba(245,200,66,0.3);
+  border-radius: 14px;
+  padding: 1.5rem 2rem;
+  text-align: center;
+  display: none;
+  width: 100%; max-width: 420px;
+  position: relative; z-index: 1;
+  margin-top: 4rem;
+  animation: fadeUp 0.5s ease both;
+}
+.already-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.already-card h3 { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+.already-card p { font-size: 0.85rem; color: var(--white-dim); margin-top: 0.4rem; }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="logo">EJEP 2026</a>
+
+<!-- 통계 바 -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num" id="s-total">—</div>
+    <div class="stat-label">총원</div>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat">
+    <div class="stat-num" id="s-attended" style="color:#7DE8B4">—</div>
+    <div class="stat-label">참석</div>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat">
+    <div class="stat-num" id="s-absent" style="color:#FFB3A7">—</div>
+    <div class="stat-label">결원</div>
+  </div>
+</div>
+
+<!-- 체크인 폼 -->
+<div class="card" id="form-card">
+  <div class="card-title">체크인</div>
+  <div class="card-sub">이름과 전화번호 끝 3자리를 입력해주세요</div>
+
+  <div class="field">
+    <label for="inp-name">이름</label>
+    <input type="text" id="inp-name" placeholder="홍길동" autocomplete="off" inputmode="text">
+  </div>
+  <div class="field">
+    <label for="inp-phone">전화번호 끝 3자리</label>
+    <input type="number" id="inp-phone" placeholder="678" maxlength="3" inputmode="numeric">
+  </div>
+
+  <button class="btn" id="btn-checkin" onclick="doCheckin()">체크인하기</button>
+  <div class="error-msg" id="error-msg"></div>
+</div>
+
+<!-- 체크인 완료 결과 -->
+<div class="result-card" id="result-card">
+  <div class="result-header">
+    <div class="check-icon">✓</div>
+    <h2 id="res-name">환영합니다!</h2>
+    <p id="res-time"></p>
+  </div>
+  <div class="result-body">
+    <div class="info-row">
+      <span class="info-key">팀 배정</span>
+      <span class="badge" id="res-team">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">방 배정</span>
+      <span class="info-val" id="res-room">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">성별 / 나이</span>
+      <span class="info-val" id="res-info">—</span>
+    </div>
+    <div class="note-box" id="res-note" style="display:none"></div>
+
+    <div class="family-section" id="family-section" style="display:none">
+      <div class="family-title">👨‍👩‍👧 함께 온 가족</div>
+      <div id="family-list"></div>
+    </div>
+  </div>
+  <button class="btn-retry" onclick="resetForm()">← 다른 사람 체크인</button>
+</div>
+
+<!-- 이미 체크인 -->
+<div class="already-card" id="already-card">
+  <div class="icon">✓</div>
+  <h3 id="already-name">이미 체크인하셨습니다</h3>
+  <p id="already-time"></p>
+  <button class="btn-retry" style="margin-top:1rem" onclick="resetForm()">← 돌아가기</button>
+</div>
+
+<script>
+const API = ''; // 같은 서버에서 서빙되므로 상대경로 사용
+
+async function loadStats() {
+  try {
+    const r = await fetch(API + '/api/stats');
+    const d = await r.json();
+    document.getElementById('s-total').textContent = d.total;
+    document.getElementById('s-attended').textContent = d.attended;
+    document.getElementById('s-absent').textContent = d.absent;
+  } catch(e) {}
+}
+
+async function doCheckin() {
+  const name = document.getElementById('inp-name').value.trim();
+  const phoneLast3 = document.getElementById('inp-phone').value.trim();
+  const errEl = document.getElementById('error-msg');
+  const btn = document.getElementById('btn-checkin');
+
+  errEl.style.display = 'none';
+  if (!name) { showError('이름을 입력해주세요.'); return; }
+  if (!phoneLast3 || phoneLast3.length !== 3) { showError('전화번호 끝 3자리를 정확히 입력해주세요.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '확인 중...';
+
+  try {
+    const r = await fetch(API + '/api/checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, phoneLast3 })
+    });
+    const d = await r.json();
+
+    if (r.status === 409) {
+      showAlready(d.member);
+      return;
+    }
+    if (!r.ok) {
+      showError(d.error || '오류가 발생했습니다.');
+      return;
+    }
+
+    showResult(d.member, d.family || []);
+    loadStats();
+
+  } catch(e) {
+    showError('서버 연결에 실패했습니다. 담당자에게 문의해주세요.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '체크인하기';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function showResult(m, family) {
+  document.getElementById('form-card').style.display = 'none';
+  document.getElementById('res-name').textContent = m.name + '님, 환영합니다! 🎉';
+  document.getElementById('res-time').textContent = '체크인 시각: ' + new Date(m.checkedInAt).toLocaleTimeString('ko-KR');
+  document.getElementById('res-team').textContent = m.team || '미배정';
+  document.getElementById('res-room').textContent = m.room || '미배정';
+  document.getElementById('res-info').textContent = (m.gender || '') + ' · ' + (m.age ? m.age + '세' : '');
+
+  const noteEl = document.getElementById('res-note');
+  if (m.note) { noteEl.textContent = '⚠️ ' + m.note; noteEl.style.display = 'block'; }
+
+  const famSec = document.getElementById('family-section');
+  if (family.length > 0) {
+    famSec.style.display = 'block';
+    document.getElementById('family-list').innerHTML = family.map(f =>
+      `<div class="family-member">
+        <span class="fm-name">${f.name} <small style="color:var(--white-dim);font-size:0.75rem">(${f.room})</small></span>
+        <span class="fm-status ${f.checkedIn ? 'done' : 'pending'}">${f.checkedIn ? '✓ 체크인' : '미도착'}</span>
+      </div>`
+    ).join('');
+  }
+
+  document.getElementById('result-card').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showAlready(m) {
+  document.getElementById('form-card').style.display = 'none';
+  document.getElementById('already-name').textContent = m.name + '님은 이미 체크인하셨습니다 ✓';
+  document.getElementById('already-time').textContent = '체크인 시각: ' + new Date(m.checkedInAt).toLocaleTimeString('ko-KR');
+  document.getElementById('already-card').style.display = 'block';
+}
+
+function resetForm() {
+  document.getElementById('form-card').style.display = 'block';
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('already-card').style.display = 'none';
+  document.getElementById('family-section').style.display = 'none';
+  document.getElementById('res-note').style.display = 'none';
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-phone').value = '';
+  document.getElementById('inp-name').focus();
+}
+
+// 엔터키 제출
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doCheckin();
+});
+
+loadStats();
+setInterval(loadStats, 30000); // 30초마다 통계 갱신
+</script>
+</body>
+</html>
