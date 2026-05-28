@@ -10,7 +10,14 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ejep2026';
 const DATA_FILE = path.join(__dirname, 'data', 'members.json');
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://ezekiel-lee.github.io',
+    'http://localhost:3000',
+    'http://localhost:5500',  // VS Code Live Server
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -59,6 +66,29 @@ app.get('/api/stats', (req, res) => {
   const total = data.members.length;
   const attended = data.members.filter(m => m.checkedIn).length;
   res.json({ total, attended, absent: total - attended, campName: data.campName });
+});
+
+// 가족 일괄 체크인
+app.post('/api/checkin/family', (req, res) => {
+  const { ids } = req.body;
+  if (!ids || !Array.isArray(ids) || ids.length === 0)
+    return res.status(400).json({ error: '체크인할 멤버 ID가 없습니다.' });
+
+  const data = readData();
+  const checkedInAt = new Date().toISOString();
+  const members = [];
+
+  ids.forEach(id => {
+    const member = data.members.find(m => m.id === id);
+    if (member && !member.checkedIn) {
+      member.checkedIn = true;
+      member.checkedInAt = checkedInAt;
+      members.push(member);
+    }
+  });
+
+  writeData(data);
+  res.json({ success: true, members });
 });
 
 // ── 관리자 API ────────────────────────────────────────────
