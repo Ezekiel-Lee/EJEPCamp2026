@@ -77,10 +77,3 @@ docker-compose up -d
 
 ---
 
-## 관리자 비밀번호
-
-기본값: `ejep2026` → **반드시 변경하세요!**
-`docker-compose.yml`의 `ADMIN_PASSWORD` 값을 수정 후 재시작:
-```bash
-docker-compose down && docker-compose up -d
-```
