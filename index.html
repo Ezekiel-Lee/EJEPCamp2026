@@ -435,7 +435,7 @@
     <li><a href="#theme">주제</a></li>
     <li><a href="#schedule">일정</a></li>
     <li><a href="#speakers">강사</a></li>
-    <li><a href="#register">등록</a></li>
+    <li><a href="#register">체크인</a></li>
     <li><a href="#location">장소</a></li>
   </ul>
 </nav>
@@ -699,14 +699,6 @@
         </div>
       </div>
     </div>
-    <div class="reg-note">참가비: 1인 $298.00 (식사·숙박 포함) · 6월 6일 캠프 도착!</div>
-    <script>
-    fetch('https://ejepcamp2026-production.up.railway.app/api/stats').then(r=>r.json()).then(d=>{
-      document.getElementById('idx-total').textContent = d.total;
-      document.getElementById('idx-attended').textContent = d.attended;
-      document.getElementById('idx-absent').textContent = d.absent;
-    }).catch(()=>{});
-    </script>
   </div>
 </section>
 
@@ -729,10 +721,6 @@
         <div class="info-value">41-53 Church St, Cowes VIC 3922</div>
       </div>
       <div class="info-item">
-        <div class="info-label">교통</div>
-        <div class="info-value">개인차량<br><span style="font-size:0.8rem;color:rgba(250,250,245,0.4);">출발지: 각자 집 혹은 픽업 포인트</span></div>
-      </div>
-      <div class="info-item">
         <div class="info-label">문의</div>
         <div class="info-value">Flow team 황종호<br><span style="color:var(--accent);">카톡으로 문의해주세용!</span></div>
       </div>
@@ -743,7 +731,7 @@
 <footer>
   <div class="footer-logo">EJEP Camp 2026</div>
   <p>임브레이스 · 하나님의 은혜로 함께합니다</p>
-  <p style="margin-top:0.5rem;">© 2026 임브레이스. All rights reserved.</p>
+  <p style="margin-top:0.5rem;">© Embrace Church Melbourne. All rights reserved.</p>
 </footer>
 
 <script>
