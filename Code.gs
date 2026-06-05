@@ -188,9 +188,9 @@ function toggleCheckin(body) {
 function exportCSV(password) {
   if (password !== ADMIN_PASSWORD) return { error: '인증 실패' };
   const members = getAllMembers();
-  const headers = ['이름','전화번호','성별','나이','가족그룹ID','방배정','팀배정','비고','체크인여부','체크인시각'];
+  const headers = ['이름','전화번호','가족그룹ID','방배정','팀배정','Dietary','체크인여부','체크인시각'];
   const rows = members.map(m => [
-    m.name, m.phone, m.gender, m.age, m.familyGroup,
+    m.name, m.phone, m.familyGroup,
     m.room, m.team, m.note,
     m.checkedIn ? '✓' : '',
     m.checkedInAt ? new Date(m.checkedInAt).toLocaleString('ko-KR') : ''
@@ -201,7 +201,7 @@ function exportCSV(password) {
 // ── 초기 헤더 설정 (최초 1회 실행) ───────────────────────
 function setupHeaders() {
   const sheet = getSheet() || SpreadsheetApp.getActiveSpreadsheet().insertSheet(SHEET_NAME);
-  const headers = ['이름','전화번호','성별','나이','가족그룹ID','방배정','팀배정','비고','체크인여부','체크인시각'];
+  const headers = ['이름','전화번호','가족그룹ID','방배정','팀배정','Dietary','체크인여부','체크인시각'];
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
   sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
   SpreadsheetApp.flush();
