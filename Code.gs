@@ -3,7 +3,7 @@
 // ============================================================
 
 const SHEET_NAME = '명단';
-const ADMIN_PASSWORD = 'ejep2026'; // ★ 나중에 변경하세요!
+const ADMIN_PASSWORD = 'psalm1331'; // ★ 나중에 변경하세요!
 
 // 컬럼 인덱스 (1부터 시작)
 const COL = {
