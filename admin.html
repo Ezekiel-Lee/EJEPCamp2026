@@ -78,8 +78,8 @@ tbody td { padding: 0.7rem 1rem; font-size: 0.88rem; vertical-align: middle; }
   .stats-grid { gap: 0.5rem; }
   .main { padding: 1rem; }
   .top-nav { padding: 0.75rem 1rem; }
-  thead th:nth-child(4), thead th:nth-child(5), thead th:nth-child(7) { display: none; }
-  tbody td:nth-child(4), tbody td:nth-child(5), tbody td:nth-child(7) { display: none; }
+  thead th:nth-child(4), thead th:nth-child(6) { display: none; }
+  tbody td:nth-child(4), tbody td:nth-child(6) { display: none; }
 }
 </style>
 </head>
@@ -123,11 +123,11 @@ tbody td { padding: 0.7rem 1rem; font-size: 0.88rem; vertical-align: middle; }
       <table>
         <thead>
           <tr>
-            <th>이름</th><th>팀</th><th>방</th><th>성별</th><th>나이</th><th>상태</th><th>체크인 시각</th><th>조정</th>
+            <th>이름</th><th>팀</th><th>방</th><th>Dietary</th><th>상태</th><th>체크인 시각</th><th>조정</th>
           </tr>
         </thead>
         <tbody id="member-table">
-          <tr><td colspan="8" class="loading-msg">로딩 중...</td></tr>
+          <tr><td colspan="7" class="loading-msg">로딩 중...</td></tr>
         </tbody>
       </table>
       <div class="empty-msg" id="empty-msg" style="display:none">검색 결과가 없습니다.</div>
@@ -205,7 +205,12 @@ function renderTable() {
   let members = [...allMembers];
   if (currentFilter === 'attended') members = members.filter(m => m.checkedIn);
   if (currentFilter === 'absent') members = members.filter(m => !m.checkedIn);
-  if (q) members = members.filter(m => m.name.includes(q) || (m.room||'').toLowerCase().includes(q) || (m.team||'').toLowerCase().includes(q));
+  if (q) members = members.filter(m =>
+    m.name.includes(q) ||
+    (m.room||'').toLowerCase().includes(q) ||
+    (m.team||'').toLowerCase().includes(q) ||
+    (m.note||'').toLowerCase().includes(q)
+  );
 
   members.sort((a, b) => {
     const ga = a.familyGroup || 'ZZZ_' + a.name;
@@ -222,13 +227,14 @@ function renderTable() {
   tbody.innerHTML = members.map(m => {
     const isNewGroup = m.familyGroup && m.familyGroup !== lastGroup;
     if (m.familyGroup) lastGroup = m.familyGroup;
-    const checkinTime = m.checkedInAt ? new Date(m.checkedInAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '—';
+    const checkinTime = m.checkedInAt
+      ? new Date(m.checkedInAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      : '—';
     return `<tr style="${isNewGroup ? 'background:rgba(245,200,66,0.03)' : ''}">
-      <td>${m.name}${m.familyGroup ? `<span class="tag-family">${m.familyGroup}</span>` : ''}${m.note ? `<div class="note-tag">⚠ ${m.note}</div>` : ''}</td>
+      <td>${m.name}${m.familyGroup ? `<span class="tag-family">${m.familyGroup}</span>` : ''}</td>
       <td>${m.team || '—'}</td>
       <td>${m.room || '—'}</td>
-      <td>${m.gender || '—'}</td>
-      <td>${m.age ? m.age + '세' : '—'}</td>
+      <td>${m.note ? `<span class="note-tag">⚠ ${m.note}</span>` : '—'}</td>
       <td><span class="status-badge ${m.checkedIn ? 'done' : 'pending'}">${m.checkedIn ? '✓ 참석' : '미도착'}</span></td>
       <td style="font-size:0.8rem;color:var(--white-dim)">${checkinTime}</td>
       <td><button class="btn-toggle ${m.checkedIn ? 'check-out' : 'check-in'}" onclick="toggleCheckin(${m.id}, ${!m.checkedIn})">${m.checkedIn ? '취소' : '체크인'}</button></td>

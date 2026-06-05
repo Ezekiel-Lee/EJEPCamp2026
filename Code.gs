@@ -9,14 +9,12 @@ const ADMIN_PASSWORD = 'ejep2026'; // ★ 나중에 변경하세요!
 const COL = {
   NAME: 1,        // 이름
   PHONE: 2,       // 전화번호
-  GENDER: 3,      // 성별
-  AGE: 4,         // 나이
-  FAMILY: 5,      // 가족그룹ID
-  ROOM: 6,        // 방배정
-  TEAM: 7,        // 팀배정
-  NOTE: 8,        // 비고
-  CHECKED_IN: 9,  // 체크인여부
-  CHECKED_AT: 10  // 체크인시각
+  FAMILY: 3,      // 가족ID
+  ROOM: 4,         // 방배정
+  TEAM: 5,      // 팀배정
+  NOTE: 6,        // Dietary
+  CHECKED_IN: 7,  // 체크인여부
+  CHECKED_AT: 8  // 체크인시각
 };
 
 function doGet(e) {
@@ -84,19 +82,17 @@ function getAllMembers() {
   const lastRow = getLastRow();
   if (lastRow < 2) return [];
 
-  const data = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
+  const data = sheet.getRange(2, 1, lastRow - 1, 8).getValues();
   return data.map((row, i) => ({
-    id: i + 2, // 실제 행 번호
-    name: String(row[COL.NAME - 1] || '').trim(),
-    phone: String(row[COL.PHONE - 1] || '').replace(/\D/g, ''),
-    gender: String(row[COL.GENDER - 1] || '').trim(),
-    age: row[COL.AGE - 1] || null,
-    familyGroup: String(row[COL.FAMILY - 1] || '').trim(),
-    room: String(row[COL.ROOM - 1] || '').trim(),
-    team: String(row[COL.TEAM - 1] || '').trim(),
-    note: String(row[COL.NOTE - 1] || '').trim(),
-    checkedIn: row[COL.CHECKED_IN - 1] === true || row[COL.CHECKED_IN - 1] === 'TRUE' || row[COL.CHECKED_IN - 1] === '✓',
-    checkedInAt: row[COL.CHECKED_AT - 1] ? String(row[COL.CHECKED_AT - 1]) : null
+    id: i + 2,
+    name: String(row[0] || '').trim(),
+    phone: String(row[1] || '').replace(/\D/g, ''),
+    familyGroup: String(row[2] || '').trim(),
+    room: String(row[3] || '').trim(),
+    team: String(row[4] || '').trim(),
+    note: String(row[5] || '').trim(),
+    checkedIn: row[6] === true || row[6] === 'TRUE' || row[6] === '✓',
+    checkedInAt: row[7] ? String(row[7]) : null
   })).filter(m => m.name !== '');
 }
 
